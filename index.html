@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>求人チェックリスト(近畿・障がい者雇用)</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--fg:#1d2733;--sub:#5b6776;--line:#dde2e8;
+  --accent:#0f6b8f;--accent-fg:#fff;--ok:#1b7a43;--ok-bg:#e6f4ec;
+  --warn:#8a5a00;--warn-bg:#fff3d6;--ng:#a3322b;--ng-bg:#fbe9e7;--chip:#eef1f5;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12171d;--card:#1b222b;--fg:#e8edf2;--sub:#9aa7b5;--line:#2c3541;
+  --accent:#5cc0e6;--accent-fg:#0b1a22;--ok:#6fd49a;--ok-bg:#16301f;
+  --warn:#f0c46a;--warn-bg:#3a2e12;--ng:#ff9d94;--ng-bg:#3c1f1c;--chip:#242d38;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171d;--card:#1b222b;--fg:#e8edf2;--sub:#9aa7b5;--line:#2c3541;
+  --accent:#5cc0e6;--accent-fg:#0b1a22;--ok:#6fd49a;--ok-bg:#16301f;
+  --warn:#f0c46a;--warn-bg:#3a2e12;--ng:#ff9d94;--ng-bg:#3c1f1c;--chip:#242d38;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.65 "Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,system-ui,sans-serif;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:1.45rem;margin:0 0 4px;text-wrap:balance}
+.lead{color:var(--sub);margin:0 0 14px;font-size:.9rem}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);margin-bottom:14px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 12px;min-width:0}
+.stat b{font-size:1.15rem;display:block;line-height:1.2}
+.stat span{font-size:.72rem;color:var(--sub)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools select,.tools input[type=search]{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);min-width:0}
+button,.btn{font:inherit;font-size:.85rem;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer;text-decoration:none;display:inline-block}
+button:hover,.btn:hover{border-color:var(--accent)}
+.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+h2{font-size:1.02rem;margin:22px 0 4px;padding-left:10px;border-left:4px solid var(--accent)}
+.gnote{font-size:.82rem;color:var(--sub);margin:0 0 10px}
+.job{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.job.done{opacity:.72}
+.job.rej{opacity:.55}
+.top{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.no{background:var(--accent);color:var(--accent-fg);border-radius:6px;font-weight:700;font-size:.8rem;padding:1px 8px;flex:none}
+.ttl{flex:1 1 260px;min-width:0}
+.ttl h3{margin:0;font-size:1rem;line-height:1.45;overflow-wrap:anywhere}
+.co{color:var(--sub);font-size:.85rem;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{background:var(--chip);border-radius:999px;padding:1px 10px;font-size:.78rem}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.ng{background:var(--ng-bg);color:var(--ng)}
+.note{font-size:.82rem;color:var(--warn);background:var(--warn-bg);border-radius:8px;padding:5px 10px;margin:6px 0}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.col{min-width:0}
+.col h4{margin:0 0 4px;font-size:.78rem;color:var(--sub);letter-spacing:.06em}
+.cl label{display:flex;gap:8px;align-items:flex-start;padding:2px 0;cursor:pointer;font-size:.9rem}
+.cl input{margin-top:5px;accent-color:var(--accent);flex:none;width:16px;height:16px}
+.cl label.on span{text-decoration:line-through;color:var(--sub)}
+.field{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.field select,.field input,.field textarea{font:inherit;font-size:.9rem;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
+.field textarea{min-height:60px;resize:vertical}
+.pdfs{list-style:none;margin:6px 0 0;padding:0}
+.pdfs li{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px 8px;margin-bottom:4px;font-size:.85rem}
+.pdfs .nm{flex:1 1 140px;min-width:0;overflow-wrap:anywhere}
+.pdfs .sz{color:var(--sub);font-size:.75rem}
+.pdfs button{padding:2px 8px;font-size:.78rem}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:10px;text-align:center;color:var(--sub);font-size:.85rem}
+.drop.over{border-color:var(--accent);background:var(--chip)}
+.drop label{color:var(--accent);cursor:pointer;text-decoration:underline}
+.drop input{display:none}
+.caveats,.src{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-top:22px;font-size:.85rem}
+.caveats ul,.src ul{margin:6px 0 0;padding-left:1.2em}
+.msg{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:.85rem;z-index:20;max-width:90vw}
+a{color:var(--accent)}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>求人チェックリスト(近畿圏・障がい者雇用)</h1>
+<p class="lead">Indeedで 2026/10/28 に確認した10件。応募状況・チェック項目・メモ・PDF(履歴書、求人票、応募控えなど)を求人ごとに保存できます。<br>保存先はこのブラウザ内のみです(他の端末とは共有されません)。端末を変えるときは「書き出し」を使ってください。</p>
+
+<div class="bar">
+  <div class="stats" id="stats"></div>
+  <div class="tools">
+    <input type="search" id="q" placeholder="キーワードで絞り込み" aria-label="絞り込み">
+    <select id="fs" aria-label="状況で絞り込み"><option value="">すべての状況</option></select>
+    <button id="ex">書き出し(JSON)</button>
+    <label class="btn" for="im">読み込み</label><input id="im" type="file" accept="application/json,.json" class="hide">
+    <button id="rs">全リセット</button>
+  </div>
+</div>
+
+<div id="list"></div>
+
+<div class="caveats">
+  <b>ご確認ください</b>
+  <ul>
+    <li>A群の「就労継続支援A型」は、雇用契約を結ぶ働き方ですが、障害福祉サービスの受給者証が必要な求人です(利用条件は事業所へ要確認)。</li>
+    <li>Canvaの使用が確認できたのは No.5 のみです。「週1出社」の記載は、この10件のどれでも確認できていません(出社頻度は各社へ要確認)。</li>
+    <li>内容は主にIndeedの検索結果の表示から転記しており、募集が終了している場合があります。応募前に必ず求人ページで最新情報をご確認ください。</li>
+    <li>C群(No.9・10)は、障がい者雇用の明記は確認できていません。No.10の「障がい者積極採用」は特徴欄の表示で、条件は未確認です。</li>
+    <li>求人IDを控えられなかった No.2・3・4 は、Indeedの検索結果ページへのリンクです。会社名で探してください。</li>
+  </ul>
+</div>
+<div class="src">
+  <b>出典</b>
+  <ul><li>Indeed(jp.indeed.com)の検索結果・求人ページ、2026/10/28 に確認</li></ul>
+</div>
+</div>
+<div class="msg hide" id="msg"></div>
+
+<script>
+(function(){
+"use strict";
+var S="https://jp.indeed.com/jobs?sort=date&l="+encodeURIComponent("関西")+"&q=";
+function V(jk){return "https://jp.indeed.com/viewjob?jk="+jk;}
+function Q(q){return S+encodeURIComponent(q);}
+
+var GROUPS=[
+ {id:"A",title:"A群 障がい者雇用・デザイン系・在宅OK",note:"就労継続支援A型を含みます(受給者証が必要)。"},
+ {id:"B",title:"B群 障がい者雇用・事務系・在宅OK",note:""},
+ {id:"C",title:"C群 デザイン系・正社員(障がい者雇用の明記は未確認)",note:""}
+];
+var JOBS=[
+ {id:"j1",g:"A",co:"株式会社シーアイ・パートナーズ",t:"【デザインスキルを活かせる】障がい者雇用|Adobeデザイン業務|チラシ・バナー制作|天王寺駅チカ|就労継続支援A型",
+  area:"大阪市天王寺区",pay:"時給1,231〜1,500円",type:"パート",tags:["在宅OK","社員登用あり"],link:V("88f4b9396bec0f0c"),exact:true,note:"就労継続支援A型(受給者証が必要)"},
+ {id:"j2",g:"A",co:"株式会社シーアイ・パートナーズ",t:"【クリエイティブなお仕事に挑戦】障がい者雇用|デザイン・動画・WEB制作",
+  area:"(要確認)",pay:"時給1,231〜1,500円",type:"パート",tags:["在宅OK"],link:Q("シーアイ・パートナーズ 障がい者雇用 デザイン 動画 WEB制作"),exact:false,note:"求人IDを控えられず、検索結果へのリンクです"},
+ {id:"j3",g:"A",co:"就労継続支援A型事業所 ピースタイム(合同会社香…)",t:"チラシやパンフレットなどの作成、入力作業、小物作り",
+  area:"京都市中京区",pay:"時給1,122円",type:"パート",tags:["週1日からOK","在宅OK"],link:Q("ピースタイム 就労継続支援A型 チラシ パンフレット 京都"),exact:false,note:"求人IDを控えられず、検索結果へのリンクです。就労継続支援A型"},
+ {id:"j4",g:"A",co:"株式会社プランツ・キューブ(就労支援センター ワーク・キューブ)",t:"【障害者採用】PC・HP・印刷デザイン",
+  area:"兵庫県芦屋市",pay:"時給1,172円〜",type:"(要確認)",tags:["在宅OK","研修あり","昇給あり"],link:Q("ワーク・キューブ 障害者採用 PC HP 印刷デザイン 芦屋"),exact:false,note:"求人IDを控えられず、検索結果へのリンクです"},
+ {id:"j5",g:"A",co:"ハートフルワークス合同会社 ワークサポートつなぐ姫路",t:"【利用者求人】在宅可 就労継続支援A型事業所 Canvaでデザイン制作・データ入力",
+  area:"兵庫県姫路市",pay:"時給1,172円以上",type:"パート",tags:["週2・3日からOK","在宅可","Canva"],link:V("b333f6ab9775b87d"),exact:true,note:"Canvaの使用を確認できた唯一の求人。就労継続支援A型"},
+ {id:"j6",g:"B",co:"SGシステム株式会社",t:"【障害者採用】一般事務スタッフ",
+  area:"京都市南区",pay:"時給1,180〜1,500円",type:"パート",tags:["在宅OK"],link:V("7c0f4255aefb52a0"),exact:true,note:""},
+ {id:"j7",g:"B",co:"株式会社五健苑(就労継続支援A型事業所)",t:"【障害者採用】在宅可",
+  area:"京都市右京区",pay:"時給1,122円",type:"パート",tags:["在宅可"],link:V("43e8d6558350a674"),exact:true,note:"就労継続支援A型"},
+ {id:"j8",g:"B",co:"積水ハウス株式会社",t:"【障害者採用】事務職",
+  area:"兵庫県西宮市",pay:"年収346〜409万円",type:"正社員",tags:["在宅OK"],link:V("f349252178e4eaba"),exact:true,note:""},
+ {id:"j9",g:"C",co:"株式会社クラウドイノベーション",t:"未経験歓迎|Webデザイナー・Web制作/リモート可",
+  area:"大阪市北区",pay:"月給25〜50万円",type:"正社員",tags:["フルリモート"],link:V("bf3348893a2f5ecc"),exact:true,note:"障がい者雇用の明記は未確認"},
+ {id:"j10",g:"C",co:"株式会社TheNewGate",t:"【在宅可】Webクリエイティブデザイナー",
+  area:"大阪(京都の掲載もあり)",pay:"年収350万円以上",type:"正社員",tags:["在宅可","障がい者積極採用の表示あり"],link:V("d2e969cfdee18c26"),alt:[["京都の掲載",V("8f0260cc0a9b9f1e")]],exact:true,note:"「障がい者積極採用」は特徴欄の表示のみ。条件は未確認"}
+];
+var CHECKS=[
+ ["open","求人ページを開いて、募集が続いているか確認"],
+ ["cond","障がい者雇用の条件・受給者証の要否を確認"],
+ ["work","在宅の範囲と出社頻度(週1出社か)を確認"],
+ ["tool","使用ツール(Canva・Adobeなど)を確認"],
+ ["docs","履歴書・職務経歴書・障害者手帳の写しを準備"],
+ ["apply","応募した"],
+ ["reply","返信を確認した"],
+ ["iv","面接・見学の日程を調整した"]
+];
+var STATUS=["未着手","検討中","応募済み","面接調整中","面接済み","結果待ち","内定","見送り"];
+
+var KEY="jobs-kinki-20261028";
+var state={};
+function load(){try{var r=localStorage.getItem(KEY);if(r)state=JSON.parse(r)||{};}catch(e){state={};}}
+var memOnly=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){memOnly=true;}}
+function st(id){if(!state[id])state[id]={c:{},s:"未着手",m:"",d:""};return state[id];}
+
+/* IndexedDB for PDFs */
+var db=null,mem={};
+function openDB(){return new Promise(function(res){
+  try{var r=indexedDB.open("jobs-kinki-pdf",1);
+   r.onupgradeneeded=function(){r.result.createObjectStore("pdf",{keyPath:"id"});};
+   r.onsuccess=function(){db=r.result;res(true);};
+   r.onerror=function(){res(false);};
+  }catch(e){res(false);}
+});}
+function tx(mode){return db.transaction("pdf",mode).objectStore("pdf");}
+function pdfAll(){return new Promise(function(res){
+  if(!db){res(Object.keys(mem).map(function(k){return mem[k];}));return;}
+  var q=tx("readonly").getAll();q.onsuccess=function(){res(q.result||[]);};q.onerror=function(){res([]);};
+});}
+function pdfPut(rec){return new Promise(function(res,rej){
+  if(!db){mem[rec.id]=rec;res();return;}
+  var q=tx("readwrite").put(rec);q.onsuccess=function(){res();};q.onerror=function(){rej(q.error);};
+});}
+function pdfDel(id){return new Promise(function(res){
+  if(!db){delete mem[id];res();return;}
+  var q=tx("readwrite").delete(id);q.onsuccess=function(){res();};q.onerror=function(){res();};
+});}
+function pdfClear(){return new Promise(function(res){
+  mem={};if(!db){res();return;}
+  var q=tx("readwrite").clear();q.onsuccess=function(){res();};q.onerror=function(){res();};
+});}
+var pdfs=[];
+
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function fmt(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(0)+" KB":(n/1048576).toFixed(1)+" MB";}
+var mt;function toast(t){var m=document.getElementById("msg");m.textContent=t;m.classList.remove("hide");clearTimeout(mt);mt=setTimeout(function(){m.classList.add("hide");},2600);}
+
+function render(){
+  var q=document.getElementById("q").value.trim().toLowerCase();
+  var fs=document.getElementById("fs").value;
+  var html="";
+  GROUPS.forEach(function(g){
+    var items=JOBS.filter(function(j){
+      if(j.g!==g.id)return false;
+      var s=st(j.id);
+      if(fs&&s.s!==fs)return false;
+      if(q){var hay=(j.co+j.t+j.area+j.tags.join(" ")+s.m).toLowerCase();if(hay.indexOf(q)<0)return false;}
+      return true;
+    });
+    if(!items.length)return;
+    html+='<h2>'+esc(g.title)+'</h2>'+(g.note?'<p class="gnote">'+esc(g.note)+'</p>':'');
+    items.forEach(function(j){html+=card(j);});
+  });
+  document.getElementById("list").innerHTML=html||'<p class="lead">条件に合う求人がありません。</p>';
+  stats();
+}
+function card(j){
+  var s=st(j.id),n=JOBS.indexOf(j)+1;
+  var done=s.s==="応募済み"||s.s==="面接調整中"||s.s==="面接済み"||s.s==="結果待ち"||s.s==="内定";
+  var cls="job"+(done?" done":"")+(s.s==="見送り"?" rej":"");
+  var h='<div class="'+cls+'" data-id="'+j.id+'"><div class="top"><span class="no">No.'+n+'</span><div class="ttl"><h3>'+esc(j.t)+'</h3><div class="co">'+esc(j.co)+'</div></div></div>';
+  h+='<div class="chips"><span class="chip">'+esc(j.area)+'</span><span class="chip">'+esc(j.pay)+'</span><span class="chip">'+esc(j.type)+'</span>';
+  j.tags.forEach(function(t){h+='<span class="chip ok">'+esc(t)+'</span>';});
+  h+='</div>';
+  if(j.note)h+='<div class="note">'+esc(j.note)+'</div>';
+  h+='<div class="links"><a class="btn primary" href="'+esc(j.link)+'" target="_blank" rel="noopener noreferrer">'+(j.exact?'Indeedの求人ページを開く':'Indeedで検索して開く')+' ↗</a>';
+  (j.alt||[]).forEach(function(a){h+='<a class="btn" href="'+esc(a[1])+'" target="_blank" rel="noopener noreferrer">'+esc(a[0])+' ↗</a>';});
+  h+='</div><div class="grid"><div class="col"><h4>チェックリスト</h4><div class="cl">';
+  CHECKS.forEach(function(c){var on=!!s.c[c[0]];h+='<label class="'+(on?'on':'')+'"><input type="checkbox" data-k="'+c[0]+'"'+(on?' checked':'')+'><span>'+esc(c[1])+'</span></label>';});
+  h+='</div></div><div class="col"><h4>状況・メモ</h4>';
+  h+='<div class="field"><select data-f="s" aria-label="状況">'+STATUS.map(function(x){return '<option'+(x===s.s?' selected':'')+'>'+x+'</option>';}).join("")+'</select></div>';
+  h+='<div class="field"><input type="date" data-f="d" value="'+esc(s.d||"")+'" aria-label="応募日・面接日"></div>';
+  h+='<div class="field"><textarea data-f="m" placeholder="メモ(担当者名、確認した内容など)">'+esc(s.m)+'</textarea></div>';
+  h+='<h4>PDF添付</h4><ul class="pdfs">';
+  pdfs.filter(function(p){return p.job===j.id;}).forEach(function(p){
+    h+='<li><span class="nm">📄 '+esc(p.name)+'</span><span class="sz">'+fmt(p.size)+'</span><button data-act="view" data-pid="'+esc(p.id)+'">開く</button><button data-act="dl" data-pid="'+esc(p.id)+'">保存</button><button data-act="del" data-pid="'+esc(p.id)+'">削除</button></li>';
+  });
+  h+='</ul><div class="drop" data-drop="'+j.id+'"><label>PDFを選択<input type="file" accept="application/pdf,.pdf" multiple data-up="'+j.id+'"></label> またはここにドロップ</div>';
+  h+='</div></div></div>';
+  return h;
+}
+function stats(){
+  var total=JOBS.length,applied=0,chk=0,all=JOBS.length*CHECKS.length;
+  JOBS.forEach(function(j){var s=st(j.id);
+    if(["応募済み","面接調整中","面接済み","結果待ち","内定"].indexOf(s.s)>=0||s.c.apply)applied++;
+    chk+=CHECKS.filter(function(c){return s.c[c[0]];}).length;});
+  var cons=JOBS.filter(function(j){return st(j.id).s==="検討中";}).length;
+  document.getElementById("stats").innerHTML=
+   '<div class="stat"><b>'+total+'</b><span>求人</span></div>'+
+   '<div class="stat"><b>'+applied+'</b><span>応募済み</span></div>'+
+   '<div class="stat"><b>'+cons+'</b><span>検討中</span></div>'+
+   '<div class="stat"><b>'+chk+' / '+all+'</b><span>チェック完了</span></div>'+
+   '<div class="stat"><b>'+pdfs.length+'</b><span>添付PDF</span></div>';
+}
+
+function jobOf(el){var c=el.closest(".job");return c?c.getAttribute("data-id"):null;}
+var list=document.getElementById("list");
+list.addEventListener("change",function(e){
+  var t=e.target,id=jobOf(t);if(!id)return;
+  if(t.dataset.k){st(id).c[t.dataset.k]=t.checked;if(t.dataset.k==="apply"&&t.checked&&st(id).s==="未着手")st(id).s="応募済み";save();render();}
+  else if(t.dataset.f){st(id)[t.dataset.f]=t.value;save();render();}
+  else if(t.dataset.up){addFiles(t.dataset.up,t.files);t.value="";}
+});
+list.addEventListener("input",function(e){
+  var t=e.target;if(t.dataset&&t.dataset.f==="m"){var id=jobOf(t);st(id).m=t.value;save();}
+});
+list.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-act]");if(!b)return;
+  var p=pdfs.filter(function(x){return x.id===b.dataset.pid;})[0];if(!p)return;
+  if(b.dataset.act==="del"){pdfDel(p.id).then(function(){pdfs=pdfs.filter(function(x){return x!==p;});render();toast("削除しました");});return;}
+  var url=URL.createObjectURL(p.blob);
+  if(b.dataset.act==="view"){var w=null;try{w=window.open(url,"_blank");}catch(er){}if(!w){var a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove();}}
+  else{var a2=document.createElement("a");a2.href=url;a2.download=p.name;document.body.appendChild(a2);a2.click();a2.remove();}
+  setTimeout(function(){URL.revokeObjectURL(url);},60000);
+});
+["dragover","dragenter"].forEach(function(ev){list.addEventListener(ev,function(e){var d=e.target.closest(".drop");if(d){e.preventDefault();d.classList.add("over");}});});
+["dragleave","drop"].forEach(function(ev){list.addEventListener(ev,function(e){var d=e.target.closest(".drop");if(d)d.classList.remove("over");});});
+list.addEventListener("drop",function(e){var d=e.target.closest(".drop");if(!d)return;e.preventDefault();addFiles(d.dataset.drop,e.dataTransfer.files);});
+
+function addFiles(job,files){
+  var arr=Array.prototype.slice.call(files||[]),ok=0,bad=0,big=0;
+  var ps=arr.map(function(f){
+    var isPdf=f.type==="application/pdf"||/\.pdf$/i.test(f.name);
+    if(!isPdf){bad++;return Promise.resolve();}
+    if(f.size>20*1048576){big++;return Promise.resolve();}
+    var rec={id:job+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),job:job,name:f.name,size:f.size,blob:new Blob([f],{type:"application/pdf"}),at:Date.now()};
+    return pdfPut(rec).then(function(){pdfs.push(rec);ok++;}).catch(function(){bad++;});
+  });
+  Promise.all(ps).then(function(){render();
+    toast((ok?ok+"件を添付しました":"")+(bad?(ok?"/":"")+"PDF以外または保存できないファイルが"+bad+"件":"")+(big?(ok||bad?"/":"")+"20MB超が"+big+"件(除外)":""));});
+}
+
+document.getElementById("q").addEventListener("input",render);
+document.getElementById("fs").addEventListener("change",render);
+var sel=document.getElementById("fs");STATUS.forEach(function(x){var o=document.createElement("option");o.textContent=x;sel.appendChild(o);});
+
+document.getElementById("ex").addEventListener("click",function(){
+  var out={version:1,exported:new Date().toISOString(),state:state,pdfs:[]};
+  var pend=pdfs.map(function(p){return new Promise(function(res){var r=new FileReader();r.onload=function(){out.pdfs.push({id:p.id,job:p.job,name:p.name,size:p.size,data:r.result});res();};r.readAsDataURL(p.blob);});});
+  Promise.all(pend).then(function(){
+    var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(out)],{type:"application/json"}));
+    a.download="jobs-checklist-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();
+    toast("書き出しました(PDFを含みます)");
+  });
+});
+document.getElementById("im").addEventListener("change",function(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){
+    try{
+      var o=JSON.parse(r.result);if(!o||typeof o.state!=="object")throw new Error("bad");
+      state=o.state;save();
+      var tasks=(o.pdfs||[]).map(function(p){
+        return fetch(p.data).then(function(x){return x.blob();}).then(function(b){
+          var rec={id:p.id,job:p.job,name:p.name,size:p.size,blob:b,at:Date.now()};
+          return pdfPut(rec).then(function(){pdfs=pdfs.filter(function(x){return x.id!==rec.id;});pdfs.push(rec);});
+        });
+      });
+      return Promise.all(tasks).then(function(){render();toast("読み込みました");});
+    }catch(er){toast("読み込めませんでした(このページの書き出しファイルを選んでください)");}
+  };
+  r.readAsText(f);e.target.value="";
+});
+var armed=false,rt;
+document.getElementById("rs").addEventListener("click",function(){
+  var b=this;
+  if(!armed){armed=true;b.textContent="もう一度押すと全て消去";clearTimeout(rt);rt=setTimeout(function(){armed=false;b.textContent="全リセット";},4000);return;}
+  armed=false;b.textContent="全リセット";state={};save();pdfClear().then(function(){pdfs=[];render();toast("リセットしました");});
+});
+
+load();
+openDB().then(function(){return pdfAll();}).then(function(a){pdfs=a;render();});
+render();
+if(memOnly)toast("この環境では保存できないため、閉じると消えます");
+})();
+</script>
+</body>
+</html>
